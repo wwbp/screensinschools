@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  AWS_REGION: us-east-1
+  BUCKET: screensinschools.org
+  DISTRIBUTION_ID: E16BYKYLVPT1XN
+  FUNCTION_NAME: screensinschools-about-router
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::848180123498:role/github-actions-service-acc
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Upload before switching routes, delete stale files after, so no request lands on a missing file.
+      - name: Upload assets (cached 1 day)
+        run: >
+          aws s3 sync site/ s3://$BUCKET
+          --exclude "*.html" --exclude "*.css" --exclude "*.js" --exclude "robots.txt" --exclude "sitemap.xml"
+          --cache-control "public, max-age=86400"
+      - name: Upload pages, css, js (always revalidate)
+        run: >
+          aws s3 sync site/ s3://$BUCKET
+          --exclude "*" --include "*.html" --include "*.css" --include "*.js" --include "robots.txt" --include "sitemap.xml"
+          --cache-control "no-cache"
+
+      - name: Publish CloudFront function
+        run: |
+          etag=$(aws cloudfront describe-function --name $FUNCTION_NAME --query ETag --output text)
+          etag=$(aws cloudfront update-function --name $FUNCTION_NAME --if-match $etag \
+            --function-config '{"Comment":"","Runtime":"cloudfront-js-2.0"}' \
+            --function-code fileb://cloudfront/router.js --query ETag --output text)
+          aws cloudfront publish-function --name $FUNCTION_NAME --if-match $etag > /dev/null
+
+      - name: Delete files no longer in site/
+        run: aws s3 sync site/ s3://$BUCKET --delete --size-only
+
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" > /dev/null
