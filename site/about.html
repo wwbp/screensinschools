@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About · Screens in Schools</title>
+<meta name="description" content="Screens in Schools (previously Phones in Focus) is a nonpartisan research initiative supporting evidence-based policies for technology use in schools.">
+<style>
+  /* ---- Base ---- */
+  html, body { margin: 0; background: #FFFFFF; }
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #1A1A1A;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  a { color: #FFFFFF; font-weight: 700; }
+  a:hover { color: #FFFFFF; }
+  .container { max-width: 960px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+
+  /* ---- Hero (desktop) ---- */
+  #hero {
+    position: relative;
+    width: 100%;
+    min-height: 360px;
+    background: url('assets/hero-desk.png') center right / cover no-repeat;
+    display: flex;
+    align-items: center;
+  }
+  #hero .container { padding: 40px 24px; }
+  #hero .copy { max-width: 500px; }
+  #hero h1 {
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1.15;
+    color: #FFFFFF;
+    margin: 0 0 18px;
+    text-wrap: pretty;
+  }
+  #hero p {
+    font-size: 19px;
+    line-height: 1.5;
+    color: #FFFFFF;
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  /* ---- Survey ---- */
+  #survey-wrap {
+    padding: 48px 24px 64px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  #survey { position: relative; width: 100%; height: 640px; }
+  #survey iframe {
+    width: 100%; height: 100%;
+    border: 0; display: block;
+    background: #FFFFFF;
+    pointer-events: none; /* preview only; clicks go to the link below */
+  }
+  #survey .open-link { position: absolute; inset: 0; display: block; cursor: pointer; }
+
+  /* ---- Partners ---- */
+  #partners-band { background: #1E4034; color: #FFFFFF; padding: 56px 24px 64px; }
+  #partners-band .container {
+    display: flex; flex-direction: column; align-items: center; gap: 36px;
+  }
+  #partners-band .label { font-size: 20px; font-weight: 700; letter-spacing: 0.16em; }
+  #partners {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center; justify-items: center;
+    gap: 20px; width: 100%;
+  }
+  #partners img { max-height: 52px; max-width: 100%; width: auto; object-fit: contain; }
+
+  /* ---- Tablet (≤1000px) ---- */
+  @media (max-width: 1000px) {
+    #hero { background-position: right center; min-height: 400px; }
+    #partners { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 40px; }
+  }
+
+  /* ---- Mobile (≤560px) ---- */
+  @media (max-width: 560px) {
+    #hero {
+      background-image: url('assets/hero-desk-mobile.png');
+      background-position: center center;
+      min-height: 0;
+    }
+    #hero .container { padding: 80px 28px; }
+    #hero .copy { max-width: 300px; margin: 0 auto; text-align: center; }
+    #hero h1 { font-size: 29px; line-height: 1.1; margin: 0 auto 14px; max-width: 218px; }
+    #hero p { font-size: 15.5px; line-height: 1.5; }
+    #survey-wrap { padding: 12px 16px 48px; }
+    #survey { height: 720px; }
+    #partners { grid-template-columns: 1fr; gap: 28px; }
+    #partners img { max-height: 40px; }
+  }
+</style>
+</head>
+<body>
+
+  <section id="hero">
+    <div class="container">
+      <div class="copy">
+        <h1>About Screens in Schools</h1>
+        <p>Screens in Schools (previously Phones in Focus) is a nonpartisan research initiative. Our work supports <b>evidence-based policies for technology use in schools.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="survey-wrap" class="container">
+    <div id="survey">
+      <iframe id="survey-frame" src="https://wharton.qualtrics.com/jfe/form/SV_bxUuSACfns11z5s" title="Screens in Schools survey" tabindex="-1" loading="lazy"></iframe>
+      <a id="survey-link" class="open-link" href="https://wharton.qualtrics.com/jfe/form/SV_bxUuSACfns11z5s" target="_blank" rel="noopener" aria-label="Open the Screens in Schools survey in a new tab"></a>
+    </div>
+  </section>
+
+  <section id="partners-band">
+    <div class="container">
+      <div class="label">THANK YOU</div>
+      <div id="partners">
+        <img src="partners/p1-white.png" alt="Bezos Family Foundation">
+        <img src="partners/p2-white.png" alt="Walton Family Foundation">
+        <img src="partners/p3-white.png" alt="National Governors Association">
+        <img src="partners/p4-white.png" alt="Stanford Impact Labs">
+        <img src="partners/p5-white.png" alt="Stuart Foundation">
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Fresh URL on every load so the browser never serves a cached survey page.
+    (function () {
+      var base = 'https://wharton.qualtrics.com/jfe/form/SV_bxUuSACfns11z5s';
+      var url = base + '?nocache=' + Date.now().toString(36);
+      document.getElementById('survey-frame').src = url;
+      document.getElementById('survey-link').href = url;
+    })();
+  </script>
+</body>
+</html>
