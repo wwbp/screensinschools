@@ -26,7 +26,7 @@ python3 -m http.server -d site    # preview at http://localhost:8000/about/
 
 ## Deploy
 
-Merge to `main`. GitHub Actions ([ci.yml](.github/workflows/ci.yml)) runs the tests and then:
+Merge to `main` (non-technical guide: [docs/UPDATING.md](docs/UPDATING.md)). GitHub Actions ([ci.yml](.github/workflows/ci.yml)) runs the tests and then:
 
 1. Syncs `site/` to S3. HTML, CSS and JS get `no-cache`; everything else gets a 1-day cache.
 2. Publishes `cloudfront/router.js` to the CloudFront function.
