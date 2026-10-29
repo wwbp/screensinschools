@@ -65,3 +65,16 @@ for (const file of html) {
 test('site/about/index.html exists (served at /about/)', () => {
   assert.ok(fs.existsSync(path.join(SITE, 'about/index.html')));
 });
+
+test('every "survey" button on the About page opens the main survey page', () => {
+  const text = fs.readFileSync(path.join(SITE, 'about/index.html'), 'utf8');
+  const ctas = [...text.matchAll(/<a\b[^>]*>(?:(?!<\/a>)[\s\S])*?survey(?:(?!<\/a>)[\s\S])*?<\/a>/gi)].map((m) => m[0]);
+  assert.ok(ctas.length >= 3, `expected 3+ survey buttons, found ${ctas.length}`);
+  assert.deepEqual(ctas.filter((a) => !/href="https:\/\/screensinschools\.org\/[?"]/.test(a)), []);
+});
+
+// Large images slow the page down; resize before uploading (see docs/UPDATING.md).
+test('no image in site/ is over 400 KB', () => {
+  const big = files.filter((f) => /\.(png|jpe?g|webp|gif)$/i.test(f) && fs.statSync(f).size > 400 * 1024);
+  assert.deepEqual(big.map(rel), []);
+});
